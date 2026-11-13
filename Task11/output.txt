@@ -1,0 +1,8 @@
+$ gcc -Wall -Wextra config_read.c -o config_read && ./config_read
+Tariff read from file: 100 200 0 225 450 5000
+Start-up cost to read t=6 values: 1.28 microseconds per run
+Space: 6 x 8 bytes = 48 bytes
+
+$ cp ../Task08/main08.c . && bash -c 'time gcc -Wall -Wextra main08.c billing.c -o m11' 2>&1 | grep real; rm -f main08.c m11
+real	0m0.044s
+
