@@ -1,0 +1,3 @@
+Tariff read from file: 100 200 0 225 450 5000
+Start-up cost to read t=6 values: 60.11 microseconds per run
+Space: 6 x 4 bytes = 24 bytes

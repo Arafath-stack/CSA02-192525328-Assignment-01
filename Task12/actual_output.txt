@@ -1,0 +1,5 @@
+Tariff file: tariff.cfg  (slabs 100/200, rates 0/225/450 paise, peak 120% for 18:00-22:00)
+Readings processed : 2880
+Total energy       : 254394 Wh (254.394 units)
+Peak-hour energy   : 98396 Wh
+Monthly bill       : Rs 557.10

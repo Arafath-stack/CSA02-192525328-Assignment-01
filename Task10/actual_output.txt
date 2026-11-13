@@ -1,0 +1,21 @@
+       n | paise (long long) |  int total(wrap) |       float Rs |      double Rs | float error Rs
+    4000 |        204183650 |        204183650 |     2041836.50 |   2041836.5000 | 0.00
+         int overflow? no   long overflow? no   long long overflow? no (max 9223372036854775807)
+   60000 |       3065830050 |      -1229137246 |    30654376.00 |  30658300.5000 | -3924.50
+         int overflow? YES   long overflow? YES   long long overflow? no (max 9223372036854775807)
+  800000 |      40879787800 |      -2069885160 |   409513024.00 | 408797878.0000 | 715146.00
+         int overflow? YES   long overflow? YES   long long overflow? no (max 9223372036854775807)
+
+Standard minimum vs this system:
+  short     : standard >= 2 bytes, here 2
+  int       : standard >= 2 bytes, here 4
+  long      : standard >= 4 bytes, here 4
+  long long : standard >= 8 bytes, here 8
+
+When does double lose accuracy? 2^53 = 9007199254740992
+  (double)2^53 + 1 == 2^53 ? yes - the +1 is lost
+  district total is about 4.1e10 paise, far below 2^53 (9.0e15): double stays exact for integers here
+  but double rupees with fractions (0.01) are NOT exact, so error accumulates
+
+Time per addition: long long 1.00 ns, double 2.68 ns
+Space per variable: long long 8 bytes, double 8 bytes
