@@ -1,0 +1,33 @@
+$ gcc -Wall -Wextra task02_complete.c -o task02 && ./task02
+sizeof(meter_t) = 2 bytes, maximum reading = 65535
+Consumption: 330 units
+Consumption: 256 units
+
+$ gcc -Wall -Wextra types_and_float.c -o types && ./types
+Type                  Bytes  Range
+char                      1  -128 to 127
+unsigned short            2  0 to 65535
+short                     2  -32768 to 32767
+int                       4  -2147483648 to 2147483647
+unsigned int              4  0 to 4294967295
+long                      8  -9223372036854775808 to 9223372036854775807
+long long                 8  -9223372036854775808 to 9223372036854775807
+float                     4  max 3.402823e+38, 6 digits, epsilon 1.192093e-07
+double                    8  max 1.797693e+308, 15 digits, epsilon 2.220446e-16
+
+District check: 800000 bills x Rs 1000 max = 8.0e10 paise
+  int max  = 2147483647  -> NOT enough
+  long max = 9223372036854775807 -> enough on this system
+
+Roll-over of 16-bit register:
+  65535 + 1 stored in unsigned short = 0
+
+4000 bills of Rs 123.45 (correct total = Rs 493800.00)
+  float rupees total : Rs 493781.22   <-- WRONG
+  long paise total   : Rs 493800.00   <-- exact
+
+$ gcc -Wall -Wextra money_double.c -o money_double && ./money_double
+n=  4000  double total=493800.000000  exact=493800.00  error=3.201e-08 Rs
+n= 60000  double total=7407000.000007  exact=7407000.00  error=7.453e-06 Rs
+n=800000  double total=98760000.001431  exact=98760000.00  error=1.431e-03 Rs
+
