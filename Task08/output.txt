@@ -1,0 +1,116 @@
+$ echo '--- Stage 1: preprocess (gcc -E) ---'; gcc -E main08.c -o main08.i; wc -l main08.c main08.i; tail -12 main08.i
+--- Stage 1: preprocess (gcc -E) ---
+   11 main08.c
+  835 main08.i
+  846 total
+int validate_readings(long previous, long current);
+void print_money(long paise);
+# 3 "main08.c" 2
+
+
+int main(void)
+{
+    unsigned int u = consumption(1200, 1530);
+    long b = compute_bill(u);
+    printf("Units=%u Bill=", u); print_money(b); printf("\n");
+    return 0;
+}
+
+$ echo '--- Stage 2: assembly (gcc -S) ---'; gcc -S main08.c -o main08.s; wc -l main08.s; grep -n 'call' main08.s
+--- Stage 2: assembly (gcc -S) ---
+62 main08.s
+21:	call	consumption@PLT
+25:	call	compute_bill@PLT
+32:	call	printf@PLT
+35:	call	print_money@PLT
+37:	call	putchar@PLT
+
+$ echo '--- Stage 3: object file (gcc -c) ---'; gcc -c main08.c -o main08.o; gcc -c billing.c -o billing.o; ls -l main08.o billing.o | awk '{print $5, $9}'; file main08.o | cut -c1-90; nm main08.o
+--- Stage 3: object file (gcc -c) ---
+2224 billing.o
+1808 main08.o
+main08.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped
+                 U compute_bill
+                 U consumption
+0000000000000000 T main
+                 U print_money
+                 U printf
+                 U putchar
+
+$ echo '--- Stage 4: link ---'; gcc main08.o billing.o -o billing08; ./billing08; ls -l billing08 | awk '{print $5, $9}'
+--- Stage 4: link ---
+Units=330 Bill=Rs 860.00
+16192 billing08
+
+$ echo '--- Compile-time error ---'; gcc err_compile.c -o err_compile
+--- Compile-time error ---
+err_compile.c: In function 'main':
+err_compile.c:5:5: error: expected ',' or ';' before 'printf'
+    5 |     printf("%d\n", x);
+      |     ^~~~~~
+
+$ echo '--- Link-time error ---'; gcc err_link.c -o err_link
+--- Link-time error ---
+/usr/bin/ld: /tmp/cczrE62q.o: in function `main':
+err_link.c:(.text+0xe): undefined reference to `compute_bill'
+collect2: error: ld returned 1 exit status
+
+$ echo '--- Run-time error ---'; gcc err_runtime.c -o err_runtime; ./err_runtime; echo exit code: $?
+--- Run-time error ---
+Floating point exception
+exit code: 136
+
+$ echo '--- Warnings with -Wall -Wextra ---'; gcc -Wall -Wextra warn_demo.c -o warn_demo
+--- Warnings with -Wall -Wextra ---
+warn_demo.c: In function 'main':
+warn_demo.c:6:11: warning: comparison of integer expressions of different signedness: 'int' and 'unsigned int' [-Wsign-compare]
+    6 |     if (n < u) printf("minus one is less than one\n");
+      |           ^
+warn_demo.c:8:14: warning: format '%d' expects argument of type 'int', but argument 2 has type 'long int' [-Wformat=]
+    8 |     printf("%d\n", big);
+      |             ~^     ~~~
+      |              |     |
+      |              int   long int
+      |             %ld
+warn_demo.c:4:9: warning: unused variable 'unused_variable' [-Wunused-variable]
+    4 |     int unused_variable;
+      |         ^~~~~~~~~~~~~~~
+
+$ echo '--- After fixing ---'; gcc -Wall -Wextra warn_fixed.c -o warn_fixed && ./warn_fixed
+--- After fixing ---
+minus one is less than one
+5000000000
+
+--- Split build (4 files + Makefile): first full build ---
+gcc -Wall -Wextra -O0 -c main.c
+gcc -Wall -Wextra -O0 -c input.c
+gcc -Wall -Wextra -O0 -c tariff.c
+gcc -Wall -Wextra -O0 -c report.c
+gcc -o billing main.o input.o tariff.o report.o
+
+real	0m0.080s
+user	0m0.062s
+sys	0m0.017s
+
+--- Edit tariff.c only, rebuild: only tariff.c is recompiled ---
+gcc -Wall -Wextra -O0 -c tariff.c
+gcc -o billing main.o input.o tariff.o report.o
+
+real	0m0.023s
+user	0m0.013s
+sys	0m0.010s
+
+--- Object file sizes (bytes) ---
+1552 input.o
+2264 main.o
+1640 report.o
+1744 tariff.o
+
+--- Run split program ---
+House 17: Rs 860.00
+
+--- Single-file build: any change recompiles everything ---
+
+real	0m0.034s
+user	0m0.030s
+sys	0m0.003s
