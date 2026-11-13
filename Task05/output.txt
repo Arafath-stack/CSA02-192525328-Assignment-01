@@ -1,0 +1,18 @@
+$ gcc -Wall -Wextra main05.c billing.c -o billing_normal && ./billing_normal
+Units = 330
+Bill  = Rs 860.00
+
+$ gcc -Wall -Wextra -DDEBUG main05.c billing.c -o billing_debug && ./billing_debug
+Units = 330
+[DEBUG] units=330 slab1=100 slab2=100 slab3=130
+Bill  = Rs 860.00
+
+$ ls -l billing_normal billing_debug | awk '{print $5, $9}'
+16192 billing_debug
+16192 billing_normal
+
+$ size billing_normal billing_debug
+   text	   data	    bss	    dec	    hex	filename
+   2180	    608	      8	   2796	    aec	billing_normal
+   2273	    608	      8	   2889	    b49	billing_debug
+
