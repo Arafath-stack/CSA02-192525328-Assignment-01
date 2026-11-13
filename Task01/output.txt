@@ -1,0 +1,6 @@
+$ gcc -Wall -Wextra -O0 text_vs_int.c -o text_vs_int && ./text_vs_int
+Text reading   : 6 bytes (d=5 chars + '\0')
+Integer reading: 2 bytes (unsigned short)
+Text   convert+compare: 13.8 ns per reading
+Integer compare      : 1.8 ns per reading
+
