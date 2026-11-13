@@ -1,0 +1,23 @@
+$ gcc -Wall -Wextra task03_complete.c -o task03 && ./task03
+  0 units -> Rs 50.00
+100 units -> Rs 50.00
+150 units -> Rs 162.50
+200 units -> Rs 275.00
+350 units -> Rs 950.00
+
+# RATE2_PAISE changed to 230:
+$ gcc -Wall -Wextra task03_rate230.c -o task03b && ./task03b
+  0 units -> Rs 50.00
+100 units -> Rs 50.00
+150 units -> Rs 165.00
+200 units -> Rs 280.00
+350 units -> Rs 955.00
+
+$ gcc -Wall -Wextra const_enum_version.c -o t3c && ./t3c
+  0 units -> Rs 50.00
+100 units -> Rs 50.00
+150 units -> Rs 162.50
+200 units -> Rs 275.00
+350 units -> Rs 950.00
+sizeof(RATE2_PAISE) = 8 bytes of storage; &RATE2_PAISE exists: 0x559b86744010
+
