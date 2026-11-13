@@ -1,0 +1,51 @@
+$ gcc -Wall -Wextra -O2 smart_billing.c -o smart_billing && echo 'compiled with no warnings'
+compiled with no warnings
+
+$ echo 'Test A: constant 100 Wh per reading, peak surcharge off (100%) - must equal old bill for 288 units, Rs 671.00'; ./smart_billing tariff_nopeak.cfg 100
+Test A: constant 100 Wh per reading, peak surcharge off (100%) - must equal old bill for 288 units, Rs 671.00
+Tariff file: tariff_nopeak.cfg  (slabs 100/200, rates 0/225/450 paise, peak 100% for 18:00-22:00)
+Readings processed : 2880
+Total energy       : 288000 Wh (288.000 units)
+Peak-hour energy   : 48000 Wh
+Monthly bill       : Rs 671.00
+
+$ echo 'Test B: constant 100 Wh per reading, 20% peak surcharge'; ./smart_billing tariff.cfg 100
+Test B: constant 100 Wh per reading, 20% peak surcharge
+Tariff file: tariff.cfg  (slabs 100/200, rates 0/225/450 paise, peak 120% for 18:00-22:00)
+Readings processed : 2880
+Total energy       : 288000 Wh (288.000 units)
+Peak-hour energy   : 48000 Wh
+Monthly bill       : Rs 692.24
+
+$ echo 'Test C: realistic daily pattern, 20% peak surcharge'; ./smart_billing tariff.cfg
+Test C: realistic daily pattern, 20% peak surcharge
+Tariff file: tariff.cfg  (slabs 100/200, rates 0/225/450 paise, peak 120% for 18:00-22:00)
+Readings processed : 2880
+Total energy       : 254394 Wh (254.394 units)
+Peak-hour energy   : 98396 Wh
+Monthly bill       : Rs 557.10
+
+$ echo 'Test D: Rs 2.25 -> Rs 2.30 changed in the FILE only, no recompiling'; ./smart_billing tariff_rate230.cfg
+Test D: Rs 2.25 -> Rs 2.30 changed in the FILE only, no recompiling
+Tariff file: tariff_rate230.cfg  (slabs 100/200, rates 0/230/450 paise, peak 120% for 18:00-22:00)
+Readings processed : 2880
+Total energy       : 254394 Wh (254.394 units)
+Peak-hour energy   : 98396 Wh
+Monthly bill       : Rs 562.47
+
+$ echo 'Test E: tariff file missing'; ./smart_billing nofile.cfg; echo exit code: $?
+Test E: tariff file missing
+ERROR: cannot open tariff file nofile.cfg
+exit code: 1
+
+$ echo 'Largest values analysis'; ./smart_billing tariff.cfg 0 x | sed -n '/Assumption/,$p'
+Largest values analysis
+Assumption: maximum connection 15 kW, flat out all the time.
+  one 15-minute reading   : 3750 Wh      (fits in 16 bits? yes)
+  one house, one month    : 10800000 Wh (fits in 16 bits? NO; in 32 bits? yes)
+  one house, one year     : 131400000 Wh (in 32 bits? yes)  = 131400 kWh (in 16 bits? NO)
+  district (800000), year : 105120000000000 Wh (in 32 bits? NO; in 64 bits? yes)
+  readings per house/year : 35040 (4 x 24 x 365)
+  district readings/year  : 28032000000 (> INT_MAX 2147483647: needs 64-bit counter)
+  one house year, cost accumulator Wh x 450 x 120 = 7095600000000 (32-bit? NO, 64-bit? yes)
+
