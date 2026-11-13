@@ -1,0 +1,41 @@
+$ gcc -Wall -Wextra read_scanf.c billing.c -o read_scanf && echo compiled
+compiled
+
+$ echo '17 1200 1530' | ./read_scanf
+Enter house no, previous reading, current reading: House 17 | units 330 | fixed Rs 50.00 | total Rs 860.00
+
+$ echo '17 65400 120' | ./read_scanf
+Enter house no, previous reading, current reading: House 17 | units 256 | fixed Rs 50.00 | total Rs 527.00
+
+$ echo 'abc 12 40' | ./read_scanf
+Enter house no, previous reading, current reading: Invalid input: enter three whole numbers.
+
+$ echo '17 1530 1200' | ./read_scanf
+Enter house no, previous reading, current reading: Rejected (code 3)
+
+$ gcc -Wall -Wextra specifiers.c -o specifiers; ./specifiers
+specifiers.c: In function 'main':
+specifiers.c:14:50: warning: format '%d' expects argument of type 'int', but argument 2 has type 'long int' [-Wformat=]
+   14 |     printf("long 5000000000 printed with %%d  : %d\n", l);
+      |                                                 ~^     ~
+      |                                                  |     |
+      |                                                  int   long int
+      |                                                 %ld
+%d  int       : 162
+%u  unsigned  : 65535
+%ld long      : 5000000000
+%lld long long: 80000000000
+%f  float/dbl : 2.250000 4.500000
+%c  char      : R
+%s  string    : Rs
+
+--- wrong specifier test ---
+long 5000000000 printed with %d  : 705032704
+
+16250 paise printed as rupees: Rs 162.50
+
+$ gcc -Wall -Wextra read_fgets.c -o read_fgets; echo '12x' | ./read_fgets; echo '1530' | ./read_fgets
+Enter previous reading: Invalid input '12x
+' -- line discarded, program continues safely.
+Enter previous reading: Parsed value = 1530
+
