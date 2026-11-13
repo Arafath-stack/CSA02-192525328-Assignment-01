@@ -1,0 +1,33 @@
+$ gcc -Wall -Wextra conversions.c -o conversions && ./conversions
+conversions.c: In function 'main':
+conversions.c:23:62: warning: comparison of integer expressions of different signedness: 'int' and 'unsigned int' [-Wsign-compare]
+   23 |     printf("(-1 < 1u) is %d   (-1 became 4294967295)\n", neg < one);
+      |                                                              ^
+--- Surprise 1: integer division ---
+units/100 = 2.00 (expected 2.50); 5/2 = 2
+
+--- Surprise 2: integer promotion of unsigned short ---
+m + 1          = 65536   (promoted to int, no wrap)
+(meter_t)(m+1) = 0   (cast brings roll-over back)
+
+--- Surprise 3: casting a large long to int ---
+(int)5000000000L = 705032704
+
+--- Surprise 4: signed/unsigned comparison ---
+(-1 < 1u) is 0   (-1 became 4294967295)
+
+--- Surprise 5: floating point equality ---
+0.1 + 0.2 == 0.3 ? 0
+
+--- Rounding rule: round half up in integer paise ---
+333 paise + 20% : truncated=399, rounded=400 (exact 399.6)
+
+$ gcc -Wall -Wextra float_version.c billing.c -o float_version && ./float_version
+       n   float total (Rs)   exact paise (Rs)     error (Rs)
+      10            3391.25            3391.25           0.00
+     100           49401.50           49401.50           0.00
+    1000          509301.50          509301.50           0.00
+    4000         2041836.50         2041836.50           0.00
+   60000        30654376.00        30658300.50       -3924.50
+  800000       409513024.00       408797878.00      715146.00
+
