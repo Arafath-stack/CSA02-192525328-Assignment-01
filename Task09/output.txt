@@ -1,0 +1,54 @@
+$ gcc -Wall -Wextra test09.c billing.c -o test09 && ./test09
+== Slab and boundary tests ==
+zero units                   units=    0 expected=Rs   50.00 actual=Rs   50.00  PASS
+slab 1 (50 units)            units=   50 expected=Rs   50.00 actual=Rs   50.00  PASS
+exactly 100 units            units=  100 expected=Rs   50.00 actual=Rs   50.00  PASS
+slab 2 (150 units)           units=  150 expected=Rs  162.50 actual=Rs  162.50  PASS
+exactly 200 units            units=  200 expected=Rs  275.00 actual=Rs  275.00  PASS
+slab 3 (350 units)           units=  350 expected=Rs  950.00 actual=Rs  950.00  PASS
+
+== Roll-over test ==
+consumption(65400,120) = 256 (expected 256)  PASS
+bill for rolled-over meter   units=  256 expected=Rs  527.00 actual=Rs  527.00  PASS
+
+== Reading validation ==
+normal reading               prev=  1200 cur=  1530 expected code=0 actual code=0  PASS
+roll-over 65535 -> 0         prev= 65535 cur=     0 expected code=0 actual code=0  PASS
+negative previous            prev=    -5 cur=   100 expected code=1 actual code=1  PASS
+negative current             prev=   100 cur=   -20 expected code=1 actual code=1  PASS
+above register limit         prev=   100 cur= 70000 expected code=2 actual code=2  PASS
+current<previous no roll     prev=  1530 cur=  1200 expected code=3 actual code=3  PASS
+
+== Five bills totalled by hand ==
+hand-calculated bill         units=   80 expected=Rs   50.00 actual=Rs   50.00  PASS
+hand-calculated bill         units=  120 expected=Rs   95.00 actual=Rs   95.00  PASS
+hand-calculated bill         units=  180 expected=Rs  230.00 actual=Rs  230.00  PASS
+hand-calculated bill         units=  260 expected=Rs  545.00 actual=Rs  545.00  PASS
+hand-calculated bill         units=  500 expected=Rs 1625.00 actual=Rs 1625.00  PASS
+Total by program = Rs 2545.00, by hand = Rs 2545.00  PASS
+
+== Alternative design: loop over slab arrays agrees with if-version for 0..5000 units ==
+mismatches = 0  PASS
+
+SUMMARY: 21 passed, 0 failed
+
+$ gcc -Wall -Wextra main09.c billing.c -o main09 && printf '1 1200 1530
+2 65400 120
+3 0 100
+4 100 200
+5 abc 7
+6 -5 100
+7 1530 1200
+8 0 350
+' | ./main09
+Enter: house previous current  (Ctrl-D to finish)
+House 1: 330 units, bill Rs 860.00
+House 2: 256 units, bill Rs 527.00
+House 3: 100 units, bill Rs 50.00
+House 4: 100 units, bill Rs 50.00
+Invalid input (letters or missing value) - skipping the rest of the line.
+House 6: rejected - negative reading
+House 7: rejected - current < previous without roll-over
+House 8: 350 units, bill Rs 950.00
+Bills issued: 5, total collected: Rs 2437.00
+
